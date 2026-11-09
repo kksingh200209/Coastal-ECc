@@ -1,0 +1,8 @@
+{
+  "appId": "com.coastalecc.dashboard",
+  "appName": "Coastal ECC",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  }
+}

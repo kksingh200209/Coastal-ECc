@@ -20,9 +20,12 @@ jobs:
         with:
           distribution: temurin
           java-version: '21'
-      - name: Install dependencies and generate catalog
+      - name: Install dependencies
         working-directory: mobile-dashboard
         run: npm install
+      - name: Generate web catalog
+        working-directory: mobile-dashboard
+        run: npm run build
       - name: Add Android platform and sync
         working-directory: mobile-dashboard
         run: npx cap add android && npx cap sync android

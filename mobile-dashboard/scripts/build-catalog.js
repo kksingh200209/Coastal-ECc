@@ -1,0 +1,8 @@
+const fs=require("fs"),path=require("path");const root=path.resolve(__dirname,"../.."),out=path.join(__dirname,"../www");fs.mkdirSync(out,{recursive:true});
+function frontmatter(file){const s=fs.readFileSync(file,"utf8");const m=s.match(/^---\r?\n([\s\S]*?)\r?\n---/);let name=path.basename(file,".md"),description="";if(m){for(const line of m[1].split(/\r?\n/)){if(line.startsWith("name:"))name=line.slice(5).trim().replace(/^["']|["']$/g,"");if(line.startsWith("description:"))description=line.slice(12).trim().replace(/^["']|["']$/g,"")}}return{name,description}}
+function files(dir){return fs.existsSync(dir)?fs.readdirSync(dir,{withFileTypes:true}):[]}
+const agents=files(path.join(root,"agents")).filter(x=>x.isFile()&&x.name.endsWith(".md")).map(x=>frontmatter(path.join(root,"agents",x.name)));
+const skills=files(path.join(root,"skills")).filter(x=>x.isDirectory()).map(x=>{const f=path.join(root,"skills",x.name,"SKILL.md");return fs.existsSync(f)?frontmatter(f):{name:x.name,description:""}}).sort((a,b)=>a.name.localeCompare(b.name));
+const commands=files(path.join(root,"commands")).filter(x=>x.isFile()&&x.name.endsWith(".md")).map(x=>{const v=frontmatter(path.join(root,"commands",x.name));return{name:"/"+x.name.replace(/\.md$/,""),description:v.description}});
+fs.writeFileSync(path.join(out,"data.json"),JSON.stringify({agents,skills,commands},null,2));
+for(const f of ["index.html","app.js","styles.css"])fs.copyFileSync(path.join(__dirname,"..",f),path.join(out,f));console.log("Catalog generated:",agents.length,"agents,",skills.length,"skills,",commands.length,"commands");
